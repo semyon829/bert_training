@@ -1,0 +1,30 @@
+model_weights_path: "/home/ssuhotsky/repositiries/kaggle/outputs/baseline/checkpoints/checkpoint_1.pth"
+
+trainer:
+  devices: [0]
+  cuda_distributed_training: false
+  fp16: false
+
+logger:
+  _target_: torch.utils.tensorboard.SummaryWriter
+  log_dir: ""
+
+model:
+  _target_: transformers.DistilBertForSequenceClassification.from_pretrained
+  pretrained_model_name_or_path: distilbert-base-uncased
+
+tokenizer:
+  _target_: transformers.AutoTokenizer.from_pretrained
+  pretrained_model_name_or_path: distilbert-base-uncased
+
+data_loading:
+  _target_: torch.utils.data.DataLoader
+  batch_size: 64
+  shuffle: false
+  num_workers: 16
+
+dataset:
+  _py_: pycfg/datasets/dataset.py
+  meta_path: /home/ssuhotsky/repositiries/kaggle/data/metas/meta_v0.csv
+  max_length: 160
+  

@@ -1,0 +1,62 @@
+project_name: kaggle_nlp_contradictory
+pretrained_model_name_or_path: &pretrained_model_name_or_path distilbert-base-multilingual-cased
+
+trainer:
+  epochs: 50
+  fp16: true
+  devices: [0]
+  cuda_distributed_training: true
+  monitor_metric: [accuracy/val]
+  save_all: false
+
+logger:
+  _target_: torch.utils.tensorboard.SummaryWriter
+  log_dir: /home/ssuhotsky/repositiries/contradictory_kaggle/outputs/distil_bert_baseline_1e5/logs
+
+metrics:
+  logits: true # при подсчете метрик, вычисляем дополнительно сигмоиду, если logits: true
+
+model:
+  _target_: transformers.DistilBertForSequenceClassification.from_pretrained
+  pretrained_model_name_or_path: *pretrained_model_name_or_path
+  num_labels: 3
+
+tokenizer:
+  _target_: transformers.DistilBertTokenizer.from_pretrained
+  pretrained_model_name_or_path: *pretrained_model_name_or_path
+
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 1e-5
+  weight_decay: 5e-4
+
+# scheduler:
+#   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+#   mode: max
+#   factor: 0.1
+#   patience: 10
+#   verbose: True
+
+loss:
+ _target_: torch.nn.CrossEntropyLoss
+
+data_loading:
+  batch_size: 64
+  batch_sampler: false
+  batch_sampler_alpha: 1.
+  batch_sampler_kind: random
+  shuffle: true
+  train_loader:
+    _target_: torch.utils.data.DataLoader
+    num_workers: 16
+  val_loader:
+    _target_: torch.utils.data.DataLoader
+    batch_size: 64
+    num_workers: 16
+    shuffle: false
+
+dataset:
+  _py_: pycfg/datasets/dataset.py
+  meta_path: /home/ssuhotsky/repositiries/contradictory_kaggle/data/metas/meta_v0.csv
+  
+val_dataset_types: [val]

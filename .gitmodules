@@ -1,0 +1,3 @@
+[submodule "submodules/pytorch_balanced_sampler"]
+	path = submodules/pytorch_balanced_sampler
+	url = https://github.com/khornlund/pytorch-balanced-sampler.git
